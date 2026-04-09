@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Send, Terminal, ShieldAlert, Activity } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { cn } from '../lib/utils';
+import { getSentryResponse } from '../logic/AzraelProtocol';
 
 interface Message {
   role: 'user' | 'model';
@@ -32,6 +33,16 @@ export const AzraelMessenger = () => {
     setInput('');
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
     setIsLoading(true);
+
+    // Check protocol logic first
+    const protocolResponse = getSentryResponse(userMessage);
+    if (protocolResponse.type !== 'SENTINEL_DEFAULT') {
+      setTimeout(() => {
+        setMessages(prev => [...prev, { role: 'model', text: protocolResponse.content }]);
+        setIsLoading(false);
+      }, 500);
+      return;
+    }
 
     try {
       const response = await ai.models.generateContent({

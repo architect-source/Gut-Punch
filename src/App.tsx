@@ -6,6 +6,7 @@ import type { Role, ClientData } from './types';
 import { AzraelMessenger } from './components/AzraelMessenger';
 import { AzraelChat } from './components/AzraelTruthGiver';
 import { TitanStrikeTerminal } from './components/SovereignTerminal';
+import { SystemStatus } from './components/SystemStatus';
 
 // Mock initial data
 const INITIAL_DATA: ClientData = {
@@ -124,10 +125,11 @@ export default function App() {
         </AnimatePresence>
       </div>
 
-      <footer className="border-t-2 border-ink p-4 bg-metal text-[10px] font-mono opacity-40 flex justify-between uppercase tracking-widest">
+      <footer className="border-t-2 border-ink p-4 bg-metal text-[10px] font-mono opacity-40 flex justify-between uppercase tracking-widest mb-6">
         <span>Sovereign Sentry v1.0.0</span>
         <span>Unauthorized access is prohibited</span>
       </footer>
+      <SystemStatus />
     </div>
   );
 }
