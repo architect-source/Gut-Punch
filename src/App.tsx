@@ -7,6 +7,14 @@ import { AzraelMessenger } from './components/AzraelMessenger';
 import { AzraelChat } from './components/AzraelTruthGiver';
 import { TitanStrikeTerminal } from './components/SovereignTerminal';
 import { SystemStatus } from './components/SystemStatus';
+import { TheShield } from './components/TheShield';
+import { TherapistConsultant } from './components/TherapistConsultant';
+import { TherapistGuardrail } from './components/TherapistGuardrail';
+import { auditNote } from './logic/TherapistAuditor';
+import { ResolutionTracker } from './components/ResolutionTracker';
+import { calculateResolutionScore } from './logic/FundingEngine';
+import { TheVillage } from './components/TheVillage';
+import { useSentryGuard } from './hooks/useSentryGuard';
 
 // Mock initial data
 const INITIAL_DATA: ClientData = {
@@ -25,6 +33,8 @@ export default function App() {
   const [role, setRole] = useState<Role | null>(null);
   const [data, setData] = useState<ClientData>(INITIAL_DATA);
   const [showMessenger, setShowMessenger] = useState(false);
+
+  useSentryGuard();
 
   if (!role) {
     return (
@@ -135,13 +145,13 @@ export default function App() {
 }
 
 function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: ClientData) => void }) {
-  const [activePhase, setActivePhase] = useState(1);
+  const [activePhase, setActivePhase] = useState<number | 'village'>(1);
   const [showSovereignTools, setShowSovereignTools] = useState(false);
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-        <div className="grid grid-cols-3 gap-2 flex-1 w-full">
+        <div className="grid grid-cols-4 gap-2 flex-1 w-full">
           {[1, 2, 3].map((p) => (
             <button
               key={p}
@@ -150,13 +160,25 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
                 setShowSovereignTools(false);
               }}
               className={cn(
-                "p-2 border-2 font-mono uppercase text-xs transition-all",
+                "p-2 border-2 font-mono uppercase text-[10px] transition-all",
                 activePhase === p && !showSovereignTools ? "bg-neon text-void border-neon" : "border-ink/20 hover:border-ink"
               )}
             >
               Phase {p}: {p === 1 ? 'Lock' : p === 2 ? 'Pride' : 'Shield'}
             </button>
           ))}
+          <button
+            onClick={() => {
+              setActivePhase('village');
+              setShowSovereignTools(false);
+            }}
+            className={cn(
+              "p-2 border-2 font-mono uppercase text-[10px] transition-all",
+              activePhase === 'village' && !showSovereignTools ? "bg-gargoyle-teal text-void border-gargoyle-teal" : "border-ink/20 hover:border-ink"
+            )}
+          >
+            The Village
+          </button>
         </div>
         <button
           onClick={() => setShowSovereignTools(!showSovereignTools)}
@@ -293,7 +315,10 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
                 </div>
                 <p className="text-sm mb-6 opacity-80">Evaluate one relationship or digital habit each week. Set one clear boundary and test it.</p>
                 
-                <div className="space-y-4">
+                <TheShield />
+
+                <div className="mt-8 space-y-4">
+                  <h3 className="text-sm font-mono uppercase opacity-50">Active Boundaries</h3>
                   <div className="flex gap-2">
                     <input id="boundary-input" className="brutal-input flex-1" placeholder="New Boundary..." />
                     <button 
@@ -321,6 +346,12 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
               </div>
             </div>
           )}
+
+          {activePhase === 'village' && (
+            <div className="space-y-6">
+              <TheVillage />
+            </div>
+          )}
         </motion.div>
       )}
       </AnimatePresence>
@@ -332,8 +363,15 @@ function TherapistDashboard({ data }: { data: ClientData }) {
   const [isConnected, setIsConnected] = useState(false);
   const [signature, setSignature] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
-  const [clinicalNotes, setClinicalNotes] = useState<string[]>([]);
+  const [clinicalNotes, setClinicalNotes] = useState<{ text: string; timestamp: number; audit?: string }[]>([]);
   const [newNote, setNewNote] = useState('');
+  const [auditWarning, setAuditWarning] = useState<string | null>(null);
+  
+  // Resolution & Funding State
+  const [lockVerified, setLockVerified] = useState(false);
+  const [prideVerified, setPrideVerified] = useState(false);
+  const [resolutionScore, setResolutionScore] = useState(0);
+  const [sessionCount, setSessionCount] = useState(1);
 
   const handleHandshake = () => {
     if (!signature.trim()) return;
@@ -343,6 +381,31 @@ function TherapistDashboard({ data }: { data: ClientData }) {
       setIsConnected(true);
       setIsConnecting(false);
     }, 1500);
+  };
+
+  const commitNote = () => {
+    if (!newNote.trim()) return;
+    
+    const auditResult = auditNote(newNote);
+    const noteEntry = {
+      text: newNote,
+      timestamp: Date.now(),
+      audit: auditResult.status === 'DRIFT_DETECTED' ? auditResult.warning : undefined
+    };
+
+    setClinicalNotes([noteEntry, ...clinicalNotes]);
+    setNewNote('');
+    setAuditWarning(auditResult.status === 'DRIFT_DETECTED' ? auditResult.warning || null : null);
+  };
+
+  const handleCommitResolution = () => {
+    const score = calculateResolutionScore({
+      lockVerified,
+      prideActionLogged: prideVerified ? data.logs.length : 0,
+      shieldIntegrity: data.boundaries.length * 10, // Simple heuristic for demo
+      sessionCount
+    });
+    setResolutionScore(score);
   };
 
   if (!isConnected) {
@@ -456,19 +519,22 @@ function TherapistDashboard({ data }: { data: ClientData }) {
           <div className="brutal-card border-ink/40">
             <h3 className="text-sm font-mono uppercase mb-4 opacity-50">Clinical Note Entry</h3>
             <div className="space-y-4">
+              {auditWarning && (
+                <div className="p-2 bg-blood-red/20 border border-blood-red text-blood-red text-[10px] font-mono animate-pulse">
+                  {auditWarning}
+                </div>
+              )}
               <textarea 
                 value={newNote}
-                onChange={(e) => setNewNote(e.target.value)}
+                onChange={(e) => {
+                  setNewNote(e.target.value);
+                  if (auditWarning) setAuditWarning(null);
+                }}
                 placeholder="Enter clinical observations, session summary, or risk assessment..."
                 className="brutal-input w-full h-32 resize-none text-sm"
               />
               <button 
-                onClick={() => {
-                  if (newNote.trim()) {
-                    setClinicalNotes([newNote, ...clinicalNotes]);
-                    setNewNote('');
-                  }
-                }}
+                onClick={commitNote}
                 className="brutal-btn w-full"
               >
                 COMMIT NOTE
@@ -476,11 +542,22 @@ function TherapistDashboard({ data }: { data: ClientData }) {
               
               <div className="space-y-4 mt-6">
                 {clinicalNotes.map((note, i) => (
-                  <div key={i} className="p-3 border border-ink/10 bg-void/30 text-xs leading-relaxed">
-                    <div className="text-[8px] opacity-30 mb-2 uppercase font-mono">
-                      Entry: {new Date().toLocaleDateString()} // {new Date().toLocaleTimeString()}
+                  <div key={i} className={cn(
+                    "p-3 border text-xs leading-relaxed",
+                    note.audit ? "border-blood-red bg-blood-red/5" : "border-ink/10 bg-void/30"
+                  )}>
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="text-[8px] opacity-30 uppercase font-mono">
+                        Entry: {new Date(note.timestamp).toLocaleDateString()} // {new Date(note.timestamp).toLocaleTimeString()}
+                      </div>
+                      {note.audit && <span className="text-[8px] text-blood-red font-bold uppercase">Drift Detected</span>}
                     </div>
-                    {note}
+                    <p>{note.text}</p>
+                    {note.audit && (
+                      <div className="mt-2 text-[8px] text-blood-red italic border-t border-blood-red/20 pt-1">
+                        {note.audit}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -489,6 +566,16 @@ function TherapistDashboard({ data }: { data: ClientData }) {
         </div>
 
         <div className="space-y-6">
+          <ResolutionTracker score={resolutionScore} />
+          <TherapistConsultant />
+          <TherapistGuardrail 
+            lockVerified={lockVerified}
+            prideVerified={prideVerified}
+            onLockChange={setLockVerified}
+            onPrideChange={setPrideVerified}
+            onCommit={handleCommitResolution}
+          />
+          
           <div className="brutal-card">
             <h3 className="text-sm font-mono uppercase mb-4 opacity-50">Client Risk Profile</h3>
             <div className="space-y-4">
