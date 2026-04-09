@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Shield, Lock, Heart, Pill, Users, Activity, AlertTriangle, MessageSquare } from 'lucide-react';
+import { Shield, Lock, Heart, Pill, Users, Activity, AlertTriangle, MessageSquare, Zap, Terminal as TerminalIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from './lib/utils';
 import type { Role, ClientData } from './types';
 import { AzraelMessenger } from './components/AzraelMessenger';
+import { AzraelChat } from './components/AzraelTruthGiver';
+import { TitanStrikeTerminal } from './components/SovereignTerminal';
 
 // Mock initial data
 const INITIAL_DATA: ClientData = {
@@ -132,32 +134,82 @@ export default function App() {
 
 function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: ClientData) => void }) {
   const [activePhase, setActivePhase] = useState(1);
+  const [showSovereignTools, setShowSovereignTools] = useState(false);
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-3 gap-2">
-        {[1, 2, 3].map((p) => (
-          <button
-            key={p}
-            onClick={() => setActivePhase(p)}
-            className={cn(
-              "p-2 border-2 font-mono uppercase text-xs transition-all",
-              activePhase === p ? "bg-neon text-void border-neon" : "border-ink/20 hover:border-ink"
-            )}
-          >
-            Phase {p}: {p === 1 ? 'Lock' : p === 2 ? 'Pride' : 'Shield'}
-          </button>
-        ))}
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+        <div className="grid grid-cols-3 gap-2 flex-1 w-full">
+          {[1, 2, 3].map((p) => (
+            <button
+              key={p}
+              onClick={() => {
+                setActivePhase(p);
+                setShowSovereignTools(false);
+              }}
+              className={cn(
+                "p-2 border-2 font-mono uppercase text-xs transition-all",
+                activePhase === p && !showSovereignTools ? "bg-neon text-void border-neon" : "border-ink/20 hover:border-ink"
+              )}
+            >
+              Phase {p}: {p === 1 ? 'Lock' : p === 2 ? 'Pride' : 'Shield'}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => setShowSovereignTools(!showSovereignTools)}
+          className={cn(
+            "p-2 border-2 font-mono uppercase text-xs transition-all w-full md:w-auto flex items-center justify-center gap-2",
+            showSovereignTools ? "bg-blood-red text-ink border-blood-red" : "border-blood-red/40 text-blood-red hover:border-blood-red"
+          )}
+        >
+          <Zap className="w-4 h-4" />
+          Sovereign Tools
+        </button>
       </div>
 
       <AnimatePresence mode="wait">
-        <motion.div
-          key={activePhase}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="space-y-6"
-        >
+        {showSovereignTools ? (
+          <motion.div
+            key="sovereign-tools"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+          >
+            <div className="space-y-6">
+              <div className="flex items-center gap-2 mb-2">
+                <TerminalIcon className="text-neon w-5 h-5" />
+                <h2 className="text-xl font-bold uppercase tracking-tighter">Truth Giver Protocol</h2>
+              </div>
+              <AzraelChat />
+              <div className="p-4 border-l-2 border-neon bg-neon/5 text-[10px] font-mono opacity-60">
+                [ADVISORY]: Use Truth Giver when "Vampire Clusters" (self-sabotage) are detected. 
+                Azrael will analyze the logic breach and recommend a Strike if necessary.
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="text-blood-red w-5 h-5" />
+                <h2 className="text-xl font-bold uppercase tracking-tighter">Titan Strike Terminal</h2>
+              </div>
+              <TitanStrikeTerminal impulse={data.intrusiveImpulse} />
+              <div className="p-4 border-l-2 border-blood-red bg-blood-red/5 text-[10px] font-mono opacity-60">
+                [CRITICAL]: Titan Strike is a recursive drain protocol. 
+                Use only when thoughts require immediate neutralization. 
+                Hardware is the stake.
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key={activePhase}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-6"
+          >
           {activePhase === 1 && (
             <div className="space-y-6">
               <div className="brutal-card border-neon">
@@ -268,16 +320,85 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
             </div>
           )}
         </motion.div>
+      )}
       </AnimatePresence>
     </div>
   );
 }
 
 function TherapistDashboard({ data }: { data: ClientData }) {
+  const [isConnected, setIsConnected] = useState(false);
+  const [signature, setSignature] = useState('');
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [clinicalNotes, setClinicalNotes] = useState<string[]>([]);
+  const [newNote, setNewNote] = useState('');
+
+  const handleHandshake = () => {
+    if (!signature.trim()) return;
+    setIsConnecting(true);
+    // Simulate Kinetic Handshake validation
+    setTimeout(() => {
+      setIsConnected(true);
+      setIsConnecting(false);
+    }, 1500);
+  };
+
+  if (!isConnected) {
+    return (
+      <div className="max-w-md mx-auto space-y-8 py-12">
+        <div className="brutal-card border-sentry text-center">
+          <div className="flex justify-center mb-4">
+            <Shield className="w-12 h-12 text-sentry" />
+          </div>
+          <h2 className="text-2xl font-bold mb-2">KINETIC HANDSHAKE REQUIRED</h2>
+          <p className="text-xs font-mono opacity-60 mb-6 uppercase tracking-widest">
+            Protocol: validateKineticHandshake
+          </p>
+          
+          <div className="space-y-4">
+            <div className="text-left">
+              <label className="block text-[10px] uppercase font-mono mb-1 opacity-50">Enter Client Signature / ID</label>
+              <input 
+                type="text"
+                value={signature}
+                onChange={(e) => setSignature(e.target.value)}
+                placeholder="e.g. Subject-001-ALPHA"
+                className="brutal-input w-full border-sentry focus:border-ink"
+              />
+            </div>
+            
+            <button 
+              onClick={handleHandshake}
+              disabled={isConnecting || !signature.trim()}
+              className="brutal-btn w-full bg-sentry text-ink border-sentry disabled:opacity-30 flex items-center justify-center gap-2"
+            >
+              {isConnecting ? (
+                <>
+                  <Activity className="w-4 h-4 animate-spin" />
+                  VALIDATING...
+                </>
+              ) : (
+                'AUTHORIZE CONNECTION'
+              )}
+            </button>
+          </div>
+        </div>
+        
+        <div className="p-4 border-l-2 border-sentry bg-sentry/5 text-[10px] font-mono opacity-60 leading-relaxed">
+          [SECURITY]: Handshake verifies that the 'Rebuild' was performed locally. 
+          Signature is stored as a proof of Sovereignty. Unauthorized access attempts are logged.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Clinical Oversight: {data.name}</h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold">Clinical Oversight: {data.name}</h2>
+          <span className="text-[8px] font-mono bg-neon/20 text-neon border border-neon/30 px-2 py-0.5 uppercase">Connected</span>
+        </div>
         <div className="flex items-center gap-2 text-sentry animate-pulse">
           <AlertTriangle className="w-4 h-4" />
           <span className="text-[10px] font-mono uppercase">High Risk Protocol Active</span>
@@ -331,11 +452,37 @@ function TherapistDashboard({ data }: { data: ClientData }) {
           </div>
 
           <div className="brutal-card border-ink/40">
-            <h3 className="text-sm font-mono uppercase mb-4 opacity-50">Clinical Note</h3>
-            <p className="text-xs leading-relaxed opacity-80">
-              This tool supports resolution-focused work. Combine with your existing modality (CBT, DBT, EMDR). 
-              Monitor Phase 2 logs for "Pride Action" efficacy. If "How it felt" scores remain low, consider pausing the taper.
-            </p>
+            <h3 className="text-sm font-mono uppercase mb-4 opacity-50">Clinical Note Entry</h3>
+            <div className="space-y-4">
+              <textarea 
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                placeholder="Enter clinical observations, session summary, or risk assessment..."
+                className="brutal-input w-full h-32 resize-none text-sm"
+              />
+              <button 
+                onClick={() => {
+                  if (newNote.trim()) {
+                    setClinicalNotes([newNote, ...clinicalNotes]);
+                    setNewNote('');
+                  }
+                }}
+                className="brutal-btn w-full"
+              >
+                COMMIT NOTE
+              </button>
+              
+              <div className="space-y-4 mt-6">
+                {clinicalNotes.map((note, i) => (
+                  <div key={i} className="p-3 border border-ink/10 bg-void/30 text-xs leading-relaxed">
+                    <div className="text-[8px] opacity-30 mb-2 uppercase font-mono">
+                      Entry: {new Date().toLocaleDateString()} // {new Date().toLocaleTimeString()}
+                    </div>
+                    {note}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
