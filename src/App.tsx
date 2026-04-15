@@ -15,6 +15,7 @@ import { ResolutionTracker } from './components/ResolutionTracker';
 import { calculateResolutionScore } from './logic/FundingEngine';
 import { TheVillage } from './components/TheVillage';
 import { useSentryGuard } from './hooks/useSentryGuard';
+import { TriggerLab } from './components/TriggerLab';
 
 // Mock initial data
 const INITIAL_DATA: ClientData = {
@@ -224,6 +225,10 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
                 Use only when thoughts require immediate neutralization. 
                 Hardware is the stake.
               </div>
+            </div>
+
+            <div className="lg:col-span-2 space-y-6">
+              <TriggerLab />
             </div>
           </motion.div>
         ) : (
