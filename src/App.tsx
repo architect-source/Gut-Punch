@@ -16,7 +16,7 @@ import { calculateResolutionScore } from './logic/FundingEngine';
 import { TheVillage } from './components/TheVillage';
 import { useSentryGuard } from './hooks/useSentryGuard';
 import { TriggerLab } from './components/TriggerLab';
-import { KineticOverride } from './components/KineticOverride';
+import { DeescalationToolkit } from './components/DeescalationToolkit';
 import { DSM5Bridge } from './components/DSM5Bridge';
 import { DSM5_CATEGORIES } from './constants/DSM5Data';
 import { RiskManagementProtocol } from './components/RiskManagementProtocol';
@@ -239,7 +239,17 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
             </div>
 
             <div className="space-y-6">
-              <KineticOverride />
+              <DeescalationToolkit onLog={(tool) => {
+                const newLog = {
+                  id: Math.random().toString(36).substr(2, 9),
+                  timestamp: Date.now(),
+                  trigger: 'Manual Override',
+                  action: `Used Tool: ${tool}`,
+                  feeling: 'Regulated',
+                  prideScore: 10
+                };
+                setData({ ...data, logs: [newLog, ...data.logs] });
+              }} />
             </div>
 
             <div className="space-y-6">
@@ -540,7 +550,7 @@ function TherapistDashboard({ data }: { data: ClientData }) {
           <div>
             <h4 className="text-[10px] font-bold text-sentry uppercase tracking-widest mb-3">Quick Access Sections:</h4>
             <ul className="space-y-2 text-[10px] text-zinc-400 list-disc list-inside">
-              <li>Perimeter Check – Instant regulation snapshot</li>
+              <li>De-escalation Toolkit – One-tap clinical stabilization tools</li>
               <li>DSM-5 Reference & Coherence Bridge – Searchable categories</li>
               <li>Medications – Full list with physician oversight</li>
             </ul>
@@ -760,7 +770,13 @@ function TherapistDashboard({ data }: { data: ClientData }) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <KineticOverride />
+          <DeescalationToolkit 
+            isTherapist 
+            onLog={(tool) => {
+              const newNoteText = `[SYSTEM]: Client guided through de-escalation tool: ${tool}`;
+              setClinicalNotes([{ text: newNoteText, timestamp: Date.now() }, ...clinicalNotes]);
+            }}
+          />
           <TriggerLab />
         </div>
       </div>

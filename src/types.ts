@@ -6,6 +6,7 @@ export interface LogEntry {
   trigger: string;
   action: string;
   feeling: string;
+  prideScore?: number;
 }
 
 export interface Medication {
