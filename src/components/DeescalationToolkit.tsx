@@ -261,19 +261,21 @@ export const DeescalationToolkit = ({
                 </div>
               </div>
 
-              <button 
-                onClick={() => setStep('SUGGEST')}
-                className="w-full bg-blood-red text-white py-3 font-bold uppercase text-xs hover:bg-white hover:text-black transition-all"
-              >
-                Analyze & Suggest Tools
-              </button>
-              
-              <button 
-                onClick={() => setStep('BROWSE')}
-                className="w-full border border-zinc-700 text-zinc-500 py-2 text-[10px] uppercase hover:text-white hover:border-white transition-all"
-              >
-                Browse All Tools
-              </button>
+              <div className="grid grid-cols-1 gap-3">
+                <button 
+                  onClick={() => setStep('SUGGEST')}
+                  className="w-full bg-blood-red text-white py-4 font-bold uppercase text-sm hover:bg-white hover:text-black transition-all shadow-lg flex items-center justify-center gap-2"
+                >
+                  <Zap className="w-4 h-4" /> Analyze & Suggest Tools
+                </button>
+                
+                <button 
+                  onClick={() => setStep('BROWSE')}
+                  className="w-full border-2 border-zinc-700 text-zinc-400 py-3 text-xs font-bold uppercase hover:text-white hover:border-white transition-all flex items-center justify-center gap-2"
+                >
+                  <Activity className="w-4 h-4" /> Browse All De-escalation Tools
+                </button>
+              </div>
             </motion.div>
           )}
 

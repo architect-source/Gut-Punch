@@ -163,7 +163,6 @@ export default function App() {
 
 function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: ClientData) => void }) {
   const [activePhase, setActivePhase] = useState<number | 'village' | 'tools'>(1);
-  const [showSovereignTools, setShowSovereignTools] = useState(false); // Keep for backward compatibility or remove if unused
 
   return (
     <div className="space-y-8">
@@ -394,7 +393,7 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
                   </p>
                   <div className="pt-2 flex gap-2">
                     <button 
-                      onClick={() => setShowSovereignTools(true)}
+                      onClick={() => setActivePhase('tools')}
                       className="text-[8px] uppercase font-bold text-neon hover:underline"
                     >
                       Grounding Tools
@@ -535,8 +534,15 @@ function TherapistDashboard({ data }: { data: ClientData }) {
         </div>
         
         <p className="text-xs text-zinc-300 leading-relaxed mb-6">
-          Welcome to the FMES clinical support platform. This tool integrates standard DSM-5-TR diagnostic grounding with the FMES three-phase framework to support resolution of complex trauma and intrusive impulses.
+          Welcome to the FMES clinical support platform. This interface bridges standard DSM-5-TR diagnostic grounding with the FMES three-phase framework. It is designed to support the resolution of complex trauma and intrusive impulses by reframing misdirected survival energy into stable, internal worth (Unconditional Self-Pride).
         </p>
+
+        <div className="mb-6 p-4 bg-zinc-900 border-l-2 border-gargoyle-teal">
+          <h4 className="text-[10px] font-bold text-gargoyle-teal uppercase tracking-widest mb-2">Clinical Partner Summary (ADAPT):</h4>
+          <p className="text-[10px] text-zinc-400 leading-relaxed italic">
+            The FMES protocol serves as a coherence bridge for clinical partners using the ADAPT (Adaptive Diagnostic & Action Protocol for Trauma) framework. By integrating real-time de-escalation tools with long-term identity reconstruction, FMES provides a measurable path from acute symptom management to autonomous emotional sovereignty. This system prioritizes physician-led medication oversight while empowering therapists to guide the cognitive and somatic redirection of trauma-based impulses.
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
@@ -578,28 +584,28 @@ function TherapistDashboard({ data }: { data: ClientData }) {
           <div className="brutal-card border-sentry">
             <div className="flex items-center gap-2 mb-4">
               <Pill className="text-sentry" />
-              <h3 className="text-xl">Current Medications</h3>
+              <h3 className="text-xl font-bold uppercase tracking-tighter">Current Medications</h3>
             </div>
             
-            <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest mb-6">
-              This section displays the client’s full prescribed medication list. Accurate medication information supports coordinated care between therapists and medical providers.
-            </p>
-
             <div className="p-4 bg-blood-red/10 border-2 border-blood-red mb-6">
               <h4 className="text-xs text-blood-red font-bold uppercase mb-2 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4" /> Important Safety Notice
               </h4>
               <p className="text-[10px] text-zinc-300 leading-relaxed font-bold">
-                Any changes to medication regimens — referred to in this framework as <span className="text-blood-red underline">Sovereign Chemical Command</span> — require direct approval and oversight from the prescribing physician or qualified medical provider. Therapists using FMES tools do not initiate, adjust, taper, or manage medications. Medication decisions must always occur under appropriate medical supervision.
+                Any changes to medication regimens — referred to in this framework as <span className="text-blood-red underline">Sovereign Chemical Command</span> — require direct approval and oversight from the prescribing physician or qualified medical provider. Therapists using FMES tools do not initiate, adjust, taper, or manage medications. Medication decisions must always occur under medical supervision.
               </p>
             </div>
+
+            <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest mb-6">
+              This section displays the client’s full prescribed medication list. Accurate medication information supports coordinated care between therapists and medical providers.
+            </p>
 
             <div className="space-y-8">
               {data.medications.map((med, i) => (
                 <div key={i} className="space-y-4 border-b border-zinc-800 pb-6 last:border-0 last:pb-0">
                   <div className="flex justify-between items-start">
-                    <h4 className="font-bold text-lg text-white">{med.name}</h4>
-                    <span className="text-[10px] font-mono bg-sentry text-ink px-2 py-0.5 uppercase font-bold">Active Protocol</span>
+                    <h4 className="font-bold text-lg text-white uppercase tracking-tighter">{med.name}</h4>
+                    <span className="text-[8px] font-mono text-zinc-500 uppercase">Last Reviewed: {med.lastReviewed}</span>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-6 text-[10px] font-mono uppercase tracking-widest">
@@ -611,40 +617,18 @@ function TherapistDashboard({ data }: { data: ClientData }) {
                       <span className="text-zinc-500 block">Frequency</span>
                       <span className="text-white">{med.frequency}</span>
                     </div>
-                    <div className="space-y-1">
+                    <div className="col-span-2 space-y-1 pt-2 border-t border-zinc-900">
                       <span className="text-zinc-500 block">Prescribing Physician</span>
                       <span className="text-white">{med.physician.name}</span>
-                      <span className="text-[8px] text-zinc-600 block">Last seen: {med.physician.lastSeen}</span>
+                      <span className="text-[8px] text-zinc-600 block lowercase">Last seen: {med.physician.lastSeen}</span>
                     </div>
-                    <div className="space-y-1">
-                      <span className="text-zinc-500 block">Last Reviewed</span>
-                      <span className="text-white">{med.lastReviewed}</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 text-[10px] font-mono opacity-40">
-                    <div>
-                      <span className="block text-[8px]">Taper Rate (Reference)</span>
-                      {med.taperRate}
-                    </div>
-                    <div>
-                      <span className="block text-[8px]">Target Dose (Reference)</span>
-                      {med.targetDose}
-                    </div>
-                  </div>
-
-                  <div className="text-[10px] italic text-zinc-400 bg-zinc-900 p-3 border-l-2 border-sentry">
-                    <span className="block text-[8px] text-sentry font-bold uppercase mb-1">Clinical Notes / Side Effects:</span>
-                    {med.notes}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-8 p-4 bg-blood-red/10 border-2 border-blood-red">
-              <p className="text-[10px] text-zinc-300 leading-relaxed italic">
-                This app is designed to support clinical collaboration, not to replace physician authority. If discrepancies or concerns arise, contact the prescribing provider immediately.
-              </p>
+            <div className="mt-6 p-3 border-2 border-blood-red/30 text-blood-red text-[10px] font-bold uppercase text-center">
+              Medication decisions must always occur under medical supervision.
             </div>
           </div>
 

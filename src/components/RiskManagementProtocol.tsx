@@ -22,46 +22,74 @@ export const RiskManagementProtocol = ({ onClose }: { onClose: () => void }) => 
         </button>
 
         <div className="space-y-8">
-          <div className="border-b-2 border-zinc-800 pb-4">
-            <h2 className="text-2xl font-bold text-white uppercase tracking-widest mb-2">Internal Risk Management Protocol</h2>
-            <p className="text-sentry text-xs font-bold">Fear Mastery and Emotional Sovereignty (FMES)</p>
+          <div className="border-b-2 border-zinc-800 pb-4 flex justify-between items-end">
+            <div>
+              <h2 className="text-2xl font-bold text-white uppercase tracking-widest mb-1">Internal Risk Management Protocol</h2>
+              <p className="text-sentry text-[10px] font-bold uppercase tracking-widest opacity-70">Fear Mastery and Emotional Sovereignty (FMES)</p>
+            </div>
+            <div className="text-[8px] text-zinc-600 font-mono text-right">
+              CONFIDENTIAL // CLINICAL USE ONLY<br />
+              v2.4.0_STABLE
+            </div>
           </div>
 
-          <section className="space-y-4">
-            <h3 className="text-lg font-bold text-white uppercase border-l-4 border-sentry pl-3">Purpose</h3>
-            <p className="text-sm text-zinc-400 leading-relaxed">
-              This protocol guides therapists supporting clients with complex trauma (including C-PTSD) and intrusive impulses. It reframes these experiences not as lifelong pathologies to suppress, but as misdirected survival energy (Primal Protective Energy) that can be observed, contained, redirected, and protected. The goal is resolution leading to Unconditional Self-Pride — a stable, internal sense of inherent worth that ends chronic dependency on external validation or perpetual therapeutic management.
-            </p>
-          </section>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-8">
+              <section className="space-y-4">
+                <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-sentry" /> Protocol Purpose
+                </h3>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  This protocol guides therapists supporting clients with complex trauma and intrusive impulses. It reframes these experiences as misdirected survival energy (Primal Protective Energy). The goal is resolution leading to <span className="text-white font-bold">Unconditional Self-Pride</span> — a stable, internal sense of inherent worth that ends chronic dependency on external validation.
+                </p>
+              </section>
 
-          <section className="space-y-4">
-            <h3 className="text-lg font-bold text-white uppercase border-l-4 border-blood-red pl-3">Important Clinical Notes</h3>
-            <ul className="space-y-2 text-xs text-zinc-400 list-disc list-inside">
-              <li>FMES is an adjunctive framework only and is not a replacement for evidence-based treatments such as EMDR, CPT, or DBT.</li>
-              <li><span className="text-blood-red font-bold">Medication Management:</span> Any changes (“Sovereign Chemical Command”) must occur under direct medical supervision. Therapists do not initiate, adjust, or taper medications.</li>
-              <li>Use only with stable clients who demonstrate capacity for insight-oriented work. Screen carefully for active dissociation, suicidality, or acute decompensation.</li>
-              <li>Always obtain and document informed consent. Maintain detailed progress notes and collaborate with prescribing physicians.</li>
-            </ul>
-          </section>
+              <section className="space-y-4">
+                <h3 className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-blood-red" /> Clinical Guardrails
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-3 border border-zinc-800 bg-zinc-900/30">
+                    <p className="text-[10px] text-zinc-300 font-bold mb-1 uppercase">Adjunctive Use</p>
+                    <p className="text-[9px] text-zinc-500">FMES is supplementary. Do not replace EMDR, CPT, or DBT without clinical justification.</p>
+                  </div>
+                  <div className="p-3 border border-blood-red/30 bg-blood-red/5">
+                    <p className="text-[10px] text-blood-red font-bold mb-1 uppercase">Medical Oversight</p>
+                    <p className="text-[9px] text-zinc-400">Therapists do not manage medications. All "Sovereign Chemical Command" changes require physician approval.</p>
+                  </div>
+                </div>
+              </section>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-4">
+              <h3 className="text-xs font-bold text-white uppercase tracking-widest">Stability Markers</h3>
+              <div className="space-y-2">
+                <StabilityItem label="No Active Suicidality" />
+                <StabilityItem label="No Acute Dissociation" />
+                <StabilityItem label="Informed Consent Obtained" />
+                <StabilityItem label="Physician Collaboration Active" />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <PhaseCard 
               number="I" 
               title="The Lock" 
-              goal="Separate core identity from the intrusive impulse."
-              marker="Client can notice the impulse without emotional flooding."
+              goal="Separate identity from impulse."
+              marker="Impulse observed without flooding."
             />
             <PhaseCard 
               number="II" 
               title="The Key" 
-              goal="Redirect contained energy into stable self-worth."
-              marker="The impulse loses emotional charge and is experienced as neutral."
+              goal="Redirect energy into self-worth."
+              marker="Impulse experienced as neutral."
             />
             <PhaseCard 
               number="III" 
               title="The Shield" 
-              goal="Translate internal mastery into external boundaries."
-              marker="Client independently maintains internal pride and external boundaries."
+              goal="Establish external boundaries."
+              marker="Autonomous internal pride."
             />
           </div>
 
@@ -79,6 +107,13 @@ export const RiskManagementProtocol = ({ onClose }: { onClose: () => void }) => 
     </motion.div>
   );
 };
+
+const StabilityItem = ({ label }: { label: string }) => (
+  <div className="flex items-center gap-2 p-2 border border-zinc-900 bg-black/40">
+    <div className="w-1.5 h-1.5 bg-neon rounded-full" />
+    <span className="text-[9px] text-zinc-400 uppercase font-bold tracking-widest">{label}</span>
+  </div>
+);
 
 const PhaseCard = ({ number, title, goal, marker }: { number: string, title: string, goal: string, marker: string }) => (
   <div className="brutal-card border-zinc-800 p-4 space-y-3 bg-black">
