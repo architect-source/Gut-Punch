@@ -16,6 +16,9 @@ import { calculateResolutionScore } from './logic/FundingEngine';
 import { TheVillage } from './components/TheVillage';
 import { useSentryGuard } from './hooks/useSentryGuard';
 import { TriggerLab } from './components/TriggerLab';
+import { KineticOverride } from './components/KineticOverride';
+import { DSM5Bridge } from './components/DSM5Bridge';
+import { DSM5_CATEGORIES } from './constants/DSM5Data';
 
 // Mock initial data
 const INITIAL_DATA: ClientData = {
@@ -184,12 +187,18 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
         <button
           onClick={() => setShowSovereignTools(!showSovereignTools)}
           className={cn(
-            "p-2 border-2 font-mono uppercase text-xs transition-all w-full md:w-auto flex items-center justify-center gap-2",
+            "p-2 border-2 font-mono uppercase text-xs transition-all w-full md:w-auto flex items-center justify-center gap-2 relative overflow-hidden",
             showSovereignTools ? "bg-blood-red text-ink border-blood-red" : "border-blood-red/40 text-blood-red hover:border-blood-red"
           )}
         >
-          <Zap className="w-4 h-4" />
-          Sovereign Tools
+          {showSovereignTools && (
+            <motion.div 
+              layoutId="active-glow"
+              className="absolute inset-0 bg-white/10 animate-pulse"
+            />
+          )}
+          <Zap className={cn("w-4 h-4", showSovereignTools && "animate-bounce")} />
+          {showSovereignTools ? "Close Tools" : "Sovereign Tools"}
         </button>
       </div>
 
@@ -197,37 +206,43 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
         {showSovereignTools ? (
           <motion.div
             key="sovereign-tools"
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            exit={{ opacity: 0, scale: 0.98 }}
+            className="space-y-8"
           >
-            <div className="space-y-6">
-              <div className="flex items-center gap-2 mb-2">
-                <TerminalIcon className="text-neon w-5 h-5" />
-                <h2 className="text-xl font-bold uppercase tracking-tighter">Truth Giver Protocol</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <TerminalIcon className="text-neon w-5 h-5" />
+                  <h2 className="text-xl font-bold uppercase tracking-tighter">Truth Giver Protocol</h2>
+                </div>
+                <AzraelChat />
+                <div className="p-4 border-l-2 border-neon bg-neon/5 text-[10px] font-mono opacity-60">
+                  [ADVISORY]: Use Truth Giver when "Vampire Clusters" (self-sabotage) are detected. 
+                  Azrael will analyze the logic breach and recommend a Strike if necessary.
+                </div>
               </div>
-              <AzraelChat />
-              <div className="p-4 border-l-2 border-neon bg-neon/5 text-[10px] font-mono opacity-60">
-                [ADVISORY]: Use Truth Giver when "Vampire Clusters" (self-sabotage) are detected. 
-                Azrael will analyze the logic breach and recommend a Strike if necessary.
+
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="text-blood-red w-5 h-5" />
+                  <h2 className="text-xl font-bold uppercase tracking-tighter">Titan Strike Terminal</h2>
+                </div>
+                <TitanStrikeTerminal impulse={data.intrusiveImpulse} />
+                <div className="p-4 border-l-2 border-blood-red bg-blood-red/5 text-[10px] font-mono opacity-60">
+                  [CRITICAL]: Titan Strike is a recursive drain protocol. 
+                  Use only when thoughts require immediate neutralization. 
+                  Hardware is the stake.
+                </div>
               </div>
             </div>
 
             <div className="space-y-6">
-              <div className="flex items-center gap-2 mb-2">
-                <Zap className="text-blood-red w-5 h-5" />
-                <h2 className="text-xl font-bold uppercase tracking-tighter">Titan Strike Terminal</h2>
-              </div>
-              <TitanStrikeTerminal impulse={data.intrusiveImpulse} />
-              <div className="p-4 border-l-2 border-blood-red bg-blood-red/5 text-[10px] font-mono opacity-60">
-                [CRITICAL]: Titan Strike is a recursive drain protocol. 
-                Use only when thoughts require immediate neutralization. 
-                Hardware is the stake.
-              </div>
+              <KineticOverride />
             </div>
 
-            <div className="lg:col-span-2 space-y-6">
+            <div className="space-y-6">
               <TriggerLab />
             </div>
           </motion.div>
@@ -357,6 +372,34 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
               <TheVillage />
             </div>
           )}
+
+          <div className="mt-12 pt-8 border-t border-zinc-800">
+            <h3 className="text-sm font-mono uppercase mb-6 opacity-50">Common Patterns & Grounding</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {DSM5_CATEGORIES.slice(3, 6).map(cat => (
+                <div key={cat.id} className="brutal-card border-zinc-800 p-4 space-y-3 bg-black/30">
+                  <h4 className="text-xs font-bold uppercase text-zinc-300">{cat.name.split(' ')[0]} Patterns</h4>
+                  <p className="text-[10px] text-zinc-500 italic leading-relaxed">
+                    {cat.summary.substring(0, 100)}...
+                  </p>
+                  <div className="pt-2 flex gap-2">
+                    <button 
+                      onClick={() => setShowSovereignTools(true)}
+                      className="text-[8px] uppercase font-bold text-neon hover:underline"
+                    >
+                      Grounding Tools
+                    </button>
+                    <button 
+                      onClick={() => setActivePhase(2)}
+                      className="text-[8px] uppercase font-bold text-gargoyle-teal hover:underline"
+                    >
+                      Pride Action
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </motion.div>
       )}
       </AnimatePresence>
@@ -623,6 +666,10 @@ function TherapistDashboard({ data }: { data: ClientData }) {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <DSM5Bridge />
       </div>
     </div>
   );
