@@ -19,6 +19,7 @@ import { TriggerLab } from './components/TriggerLab';
 import { KineticOverride } from './components/KineticOverride';
 import { DSM5Bridge } from './components/DSM5Bridge';
 import { DSM5_CATEGORIES } from './constants/DSM5Data';
+import { RiskManagementProtocol } from './components/RiskManagementProtocol';
 
 // Mock initial data
 const INITIAL_DATA: ClientData = {
@@ -28,7 +29,19 @@ const INITIAL_DATA: ClientData = {
   containmentStatement: 'This is in me, but it is not me.',
   logs: [],
   medications: [
-    { name: 'Sertraline', currentDose: '100mg', targetDose: '50mg', taperRate: '12.5mg every 2 weeks', notes: 'Monitor for increased anxiety during drops.' }
+    { 
+      name: 'Sertraline', 
+      currentDose: '100mg', 
+      targetDose: '50mg', 
+      taperRate: '12.5mg every 2 weeks', 
+      frequency: 'Once daily',
+      physician: {
+        name: 'Dr. Elena Ramirez',
+        lastSeen: '2026-03-15'
+      },
+      lastReviewed: '2026-04-01',
+      notes: 'Monitor for increased anxiety during drops.' 
+    }
   ],
   boundaries: []
 };
@@ -414,6 +427,7 @@ function TherapistDashboard({ data }: { data: ClientData }) {
   const [clinicalNotes, setClinicalNotes] = useState<{ text: string; timestamp: number; audit?: string }[]>([]);
   const [newNote, setNewNote] = useState('');
   const [auditWarning, setAuditWarning] = useState<string | null>(null);
+  const [showProtocol, setShowProtocol] = useState(false);
   
   // Resolution & Funding State
   const [lockVerified, setLockVerified] = useState(false);
@@ -507,6 +521,50 @@ function TherapistDashboard({ data }: { data: ClientData }) {
 
   return (
     <div className="space-y-8">
+      {showProtocol && <RiskManagementProtocol onClose={() => setShowProtocol(false)} />}
+      
+      <div className="brutal-card border-sentry bg-sentry/5">
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-1">Therapist Dashboard – Fear Mastery & Emotional Sovereignty (FMES)</h2>
+            <p className="text-[10px] text-zinc-400 font-mono uppercase tracking-widest">Clinical Support Platform // v1.0.0</p>
+          </div>
+          <button 
+            onClick={() => setShowProtocol(true)}
+            className="text-[10px] font-mono bg-sentry text-ink px-3 py-1 uppercase font-bold hover:bg-white transition-colors"
+          >
+            View Full Protocol
+          </button>
+        </div>
+        
+        <p className="text-xs text-zinc-300 leading-relaxed mb-6">
+          Welcome to the FMES clinical support platform. This tool integrates standard DSM-5-TR diagnostic grounding with the FMES three-phase framework to support resolution of complex trauma and intrusive impulses.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <h4 className="text-[10px] font-bold text-sentry uppercase tracking-widest mb-3">Core Principles:</h4>
+            <ul className="space-y-2 text-[10px] text-zinc-400 list-disc list-inside">
+              <li>DSM-5 categories provide the clinical foundation.</li>
+              <li>FMES reframes intrusive impulses as misdirected survival energy (Primal Protective Energy).</li>
+              <li>Primary outcome: Unconditional Self-Pride — stable internal worth.</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-[10px] font-bold text-sentry uppercase tracking-widest mb-3">Quick Access Sections:</h4>
+            <ul className="space-y-2 text-[10px] text-zinc-400 list-disc list-inside">
+              <li>Perimeter Check – Instant regulation snapshot</li>
+              <li>DSM-5 Reference & Coherence Bridge – Searchable categories</li>
+              <li>Medications – Full list with physician oversight</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-6 pt-4 border-t border-sentry/20 text-[8px] text-zinc-500 italic">
+          All use is adjunctive. Screen for stability, obtain informed consent, and collaborate with medical providers as needed. Document thoroughly.
+        </div>
+      </div>
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h2 className="text-2xl font-bold">Clinical Oversight: {data.name}</h2>
@@ -523,44 +581,73 @@ function TherapistDashboard({ data }: { data: ClientData }) {
           <div className="brutal-card border-sentry">
             <div className="flex items-center gap-2 mb-4">
               <Pill className="text-sentry" />
-              <h3 className="text-xl">Medication Tapering Guide</h3>
+              <h3 className="text-xl">Current Medications</h3>
             </div>
             
-            <div className="p-4 bg-sentry/10 border border-sentry/30 mb-6">
-              <p className="text-xs text-sentry font-bold uppercase mb-2 flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3" /> Non-Medical Guide
-              </p>
-              <p className="text-[10px] opacity-70 leading-relaxed">
-                This tool is for therapist reference only. Medication changes REQUIRE direct medical supervision by a psychiatrist or primary care physician. Do not adjust dosages without clinical authorization.
+            <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest mb-6">
+              This section displays the client’s full prescribed medication list. Accurate medication information supports coordinated care between therapists and medical providers.
+            </p>
+
+            <div className="p-4 bg-blood-red/10 border-2 border-blood-red mb-6">
+              <h4 className="text-xs text-blood-red font-bold uppercase mb-2 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" /> Important Safety Notice
+              </h4>
+              <p className="text-[10px] text-zinc-300 leading-relaxed font-bold">
+                Any changes to medication regimens — referred to in this framework as <span className="text-blood-red underline">Sovereign Chemical Command</span> — require direct approval and oversight from the prescribing physician or qualified medical provider. Therapists using FMES tools do not initiate, adjust, taper, or manage medications. Medication decisions must always occur under appropriate medical supervision.
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               {data.medications.map((med, i) => (
-                <div key={i} className="space-y-4 border-b border-ink/10 pb-4 last:border-0">
+                <div key={i} className="space-y-4 border-b border-zinc-800 pb-6 last:border-0 last:pb-0">
                   <div className="flex justify-between items-start">
-                    <h4 className="font-bold text-lg">{med.name}</h4>
-                    <span className="text-[10px] font-mono bg-sentry text-ink px-2 py-0.5 uppercase">Tapering</span>
+                    <h4 className="font-bold text-lg text-white">{med.name}</h4>
+                    <span className="text-[10px] font-mono bg-sentry text-ink px-2 py-0.5 uppercase font-bold">Active Protocol</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 text-xs font-mono">
-                    <div>
-                      <span className="opacity-40 block uppercase text-[8px]">Current Dose</span>
-                      {med.currentDose}
+                  
+                  <div className="grid grid-cols-2 gap-6 text-[10px] font-mono uppercase tracking-widest">
+                    <div className="space-y-1">
+                      <span className="text-zinc-500 block">Dosage</span>
+                      <span className="text-white">{med.currentDose}</span>
                     </div>
-                    <div>
-                      <span className="opacity-40 block uppercase text-[8px]">Target Dose</span>
-                      {med.targetDose}
+                    <div className="space-y-1">
+                      <span className="text-zinc-500 block">Frequency</span>
+                      <span className="text-white">{med.frequency}</span>
                     </div>
-                    <div className="col-span-2">
-                      <span className="opacity-40 block uppercase text-[8px]">Taper Rate</span>
+                    <div className="space-y-1">
+                      <span className="text-zinc-500 block">Prescribing Physician</span>
+                      <span className="text-white">{med.physician.name}</span>
+                      <span className="text-[8px] text-zinc-600 block">Last seen: {med.physician.lastSeen}</span>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-zinc-500 block">Last Reviewed</span>
+                      <span className="text-white">{med.lastReviewed}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 text-[10px] font-mono opacity-40">
+                    <div>
+                      <span className="block text-[8px]">Taper Rate (Reference)</span>
                       {med.taperRate}
                     </div>
+                    <div>
+                      <span className="block text-[8px]">Target Dose (Reference)</span>
+                      {med.targetDose}
+                    </div>
                   </div>
-                  <div className="text-[10px] italic opacity-60 bg-void p-2 border-l-2 border-sentry">
-                    Note: {med.notes}
+
+                  <div className="text-[10px] italic text-zinc-400 bg-zinc-900 p-3 border-l-2 border-sentry">
+                    <span className="block text-[8px] text-sentry font-bold uppercase mb-1">Clinical Notes / Side Effects:</span>
+                    {med.notes}
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-8 p-4 bg-blood-red/10 border-2 border-blood-red">
+              <p className="text-[10px] text-zinc-300 leading-relaxed italic">
+                This app is designed to support clinical collaboration, not to replace physician authority. If discrepancies or concerns arise, contact the prescribing provider immediately.
+              </p>
             </div>
           </div>
 

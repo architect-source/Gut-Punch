@@ -13,6 +13,12 @@ export interface Medication {
   currentDose: string;
   targetDose: string;
   taperRate: string;
+  frequency: string;
+  physician: {
+    name: string;
+    lastSeen: string;
+  };
+  lastReviewed: string;
   notes: string;
 }
 
