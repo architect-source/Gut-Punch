@@ -162,61 +162,48 @@ export default function App() {
 }
 
 function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: ClientData) => void }) {
-  const [activePhase, setActivePhase] = useState<number | 'village'>(1);
-  const [showSovereignTools, setShowSovereignTools] = useState(false);
+  const [activePhase, setActivePhase] = useState<number | 'village' | 'tools'>(1);
+  const [showSovereignTools, setShowSovereignTools] = useState(false); // Keep for backward compatibility or remove if unused
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-        <div className="grid grid-cols-4 gap-2 flex-1 w-full">
+        <div className="grid grid-cols-5 gap-2 flex-1 w-full">
           {[1, 2, 3].map((p) => (
             <button
               key={p}
-              onClick={() => {
-                setActivePhase(p);
-                setShowSovereignTools(false);
-              }}
+              onClick={() => setActivePhase(p as any)}
               className={cn(
                 "p-2 border-2 font-mono uppercase text-[10px] transition-all",
-                activePhase === p && !showSovereignTools ? "bg-neon text-void border-neon" : "border-ink/20 hover:border-ink"
+                activePhase === p ? "bg-neon text-void border-neon" : "border-ink/20 hover:border-ink"
               )}
             >
               Phase {p}: {p === 1 ? 'Lock' : p === 2 ? 'Pride' : 'Shield'}
             </button>
           ))}
           <button
-            onClick={() => {
-              setActivePhase('village');
-              setShowSovereignTools(false);
-            }}
+            onClick={() => setActivePhase('village')}
             className={cn(
               "p-2 border-2 font-mono uppercase text-[10px] transition-all",
-              activePhase === 'village' && !showSovereignTools ? "bg-gargoyle-teal text-void border-gargoyle-teal" : "border-ink/20 hover:border-ink"
+              activePhase === 'village' ? "bg-gargoyle-teal text-void border-gargoyle-teal" : "border-ink/20 hover:border-ink"
             )}
           >
             The Village
           </button>
+          <button
+            onClick={() => setActivePhase('tools')}
+            className={cn(
+              "p-2 border-2 font-mono uppercase text-[10px] transition-all",
+              activePhase === 'tools' ? "bg-blood-red text-ink border-blood-red" : "border-blood-red/40 text-blood-red hover:border-blood-red"
+            )}
+          >
+            Sovereign Tools
+          </button>
         </div>
-        <button
-          onClick={() => setShowSovereignTools(!showSovereignTools)}
-          className={cn(
-            "p-2 border-2 font-mono uppercase text-xs transition-all w-full md:w-auto flex items-center justify-center gap-2 relative overflow-hidden",
-            showSovereignTools ? "bg-blood-red text-ink border-blood-red" : "border-blood-red/40 text-blood-red hover:border-blood-red"
-          )}
-        >
-          {showSovereignTools && (
-            <motion.div 
-              layoutId="active-glow"
-              className="absolute inset-0 bg-white/10 animate-pulse"
-            />
-          )}
-          <Zap className={cn("w-4 h-4", showSovereignTools && "animate-bounce")} />
-          {showSovereignTools ? "Close Tools" : "Sovereign Tools"}
-        </button>
       </div>
 
       <AnimatePresence mode="wait">
-        {showSovereignTools ? (
+        {activePhase === 'tools' ? (
           <motion.div
             key="sovereign-tools"
             initial={{ opacity: 0, scale: 0.98 }}
@@ -752,6 +739,29 @@ function TherapistDashboard({ data }: { data: ClientData }) {
               )}
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="mt-8 space-y-8">
+        <div className="flex items-center gap-3 border-b-2 border-zinc-800 pb-4">
+          <Zap className="text-blood-red w-6 h-6" />
+          <h2 className="text-2xl font-bold uppercase tracking-widest">Sovereign Tools Reference</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <h3 className="text-sm font-mono uppercase opacity-50">Truth Giver // Azrael</h3>
+            <AzraelChat />
+          </div>
+          <div className="space-y-6">
+            <h3 className="text-sm font-mono uppercase opacity-50">Titan Strike // Neutralization</h3>
+            <TitanStrikeTerminal impulse={data.intrusiveImpulse} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <KineticOverride />
+          <TriggerLab />
         </div>
       </div>
 
