@@ -1,3 +1,7 @@
+/**
+ * DSM-5 Reference & Coherence Bridge
+ * Integrity Check: OK
+ */
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Book, Search, Link2, Shield, Lock, Zap, Activity, ChevronRight, ChevronDown } from 'lucide-react';

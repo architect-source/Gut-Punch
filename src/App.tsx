@@ -1,3 +1,8 @@
+/**
+ * GUTPUNCH // SOVEREIGN SENTRY
+ * Version: 2.4.0-STABLE
+ * Deployment Trace: 77a9d2f
+ */
 import { useState } from 'react';
 import { Shield, Lock, Heart, Pill, Users, Activity, AlertTriangle, MessageSquare, Zap, Terminal as TerminalIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';

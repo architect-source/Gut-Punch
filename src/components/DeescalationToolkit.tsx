@@ -1,3 +1,7 @@
+/**
+ * DE-ESCALATION TOOLKIT // ONE-TAP STABILIZATION
+ * Expansion Profile: ACTIVE
+ */
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
