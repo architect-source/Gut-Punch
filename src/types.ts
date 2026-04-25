@@ -31,4 +31,5 @@ export interface ClientData {
   logs: LogEntry[];
   medications: Medication[];
   boundaries: string[];
+  phase2Acknowledged?: boolean;
 }

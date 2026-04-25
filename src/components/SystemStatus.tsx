@@ -5,7 +5,7 @@ export const SystemStatus = () => (
       <span className="text-zinc-600">ANESTRAL_CLARITY: 100%</span>
     </div>
     <div className="text-zinc-700">
-      SOVEREIGN SENTRY V1.0.0 // NO CLOUD DETECTED
+      SOVEREIGN SENTRY V2.4.0-STABLE // PERIMETER SECURE
     </div>
   </footer>
 );

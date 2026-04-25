@@ -105,22 +105,23 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#050505] text-white border-[10px] border-zinc-900 flex flex-col">
       <header className="border-b-2 border-ink p-4 flex justify-between items-center bg-metal sticky top-0 z-50">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <Activity className={cn("w-6 h-6", role === 'client' ? "text-neon" : "text-sentry")} />
-          <h1 className="text-xl font-bold tracking-widest">GutPunch // {role === 'client' ? 'SENTRY' : 'OVERSEER'}</h1>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-bold tracking-widest leading-none">GutPunch // {role === 'client' ? 'SENTRY' : 'OVERSEER'}</h1>
+            <span className="text-[8px] font-mono text-neon opacity-50 uppercase mt-1">Sovereign Protocol v2.4.0-STABLE // SYNCED</span>
+          </div>
         </div>
         <div className="flex items-center gap-4">
-          {role === 'client' && (
-            <button 
-              onClick={() => setShowMessenger(!showMessenger)}
-              className={cn(
-                "p-2 border-2 transition-all",
-                showMessenger ? "bg-neon text-void border-neon" : "border-ink/20 hover:border-neon text-neon"
-              )}
-            >
-              <MessageSquare className="w-5 h-5" />
-            </button>
-          )}
+          <button 
+            onClick={() => setShowMessenger(!showMessenger)}
+            className={cn(
+              "p-2 border-2 transition-all",
+              showMessenger ? "bg-neon text-void border-neon" : "border-ink/20 hover:border-neon text-neon"
+            )}
+          >
+            <MessageSquare className="w-5 h-5" />
+          </button>
           <button 
             onClick={() => setRole(null)}
             className="text-xs font-mono uppercase border border-ink/30 px-2 py-1 hover:bg-ink hover:text-void transition-colors"
@@ -130,7 +131,7 @@ export default function App() {
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
         <main className={cn(
           "flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full overflow-y-auto transition-all duration-500",
           showMessenger && "mr-0 lg:mr-[400px]"
@@ -143,13 +144,13 @@ export default function App() {
         </main>
 
         <AnimatePresence>
-          {showMessenger && role === 'client' && (
+          {showMessenger && (
             <motion.aside
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
+              initial={{ x: '100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-[73px] right-0 bottom-[42px] w-full lg:w-[400px] z-40"
+              className="fixed top-[73px] right-[10px] bottom-[42px] w-[calc(100%-20px)] lg:w-[400px] z-50 shadow-2xl"
             >
               <AzraelMessenger />
             </motion.aside>
@@ -158,8 +159,8 @@ export default function App() {
       </div>
 
       <footer className="border-t-2 border-ink p-4 bg-metal text-[10px] font-mono opacity-40 flex justify-between uppercase tracking-widest mb-6">
-        <span>Sovereign Sentry v1.0.0</span>
-        <span>Unauthorized access is prohibited</span>
+        <span>Sovereign Sentry v2.4.0-STABLE</span>
+        <span>Secure Handshake Verified</span>
       </footer>
       <SystemStatus />
     </div>
@@ -302,29 +303,49 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
                   <Heart className="text-neon" />
                   <h2 className="text-xl">Phase 2: The Pride Directive</h2>
                 </div>
-                <p className="text-sm mb-6 opacity-80">When impulse arises, choose one small action that affirms your worth.</p>
                 
-                <form className="space-y-4" onSubmit={(e) => {
-                  e.preventDefault();
-                  const form = e.target as HTMLFormElement;
-                  const formData = new FormData(form);
-                  const newLog = {
-                    id: Math.random().toString(36).substr(2, 9),
-                    timestamp: Date.now(),
-                    trigger: formData.get('trigger') as string,
-                    action: formData.get('action') as string,
-                    feeling: formData.get('feeling') as string,
-                  };
-                  setData({ ...data, logs: [newLog, ...data.logs] });
-                  form.reset();
-                }}>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <input name="trigger" className="brutal-input" placeholder="Trigger" required />
-                    <input name="action" className="brutal-input" placeholder="Pride Action" required />
-                    <input name="feeling" className="brutal-input" placeholder="How it felt" required />
+                {!data.phase2Acknowledged ? (
+                  <div className="p-6 bg-void border-2 border-blood-red space-y-4 animate-pulse">
+                    <h3 className="text-blood-red font-bold uppercase tracking-widest text-lg">Manual Override Required</h3>
+                    <p className="text-sm italic text-zinc-300">
+                      1. Acknowledge that the voices are not your enemies—they are your unused energy.<br />
+                      2. Rewire the anxiety: it is not a warning of failure; it is the sound of the engine starting.<br />
+                      3. Click 'Acknowledge' to build your shield.
+                    </p>
+                    <button 
+                      onClick={() => setData({ ...data, phase2Acknowledged: true })}
+                      className="brutal-btn w-full bg-blood-red text-white border-blood-red"
+                    >
+                      ACKNOWLEDGE
+                    </button>
+                    <p className="text-[8px] text-zinc-500 font-mono text-center">"IF IT WAS AUTOMATIC, IT WOULD NEVER REGISTER IN THE MIND."</p>
                   </div>
-                  <button type="submit" className="brutal-btn w-full bg-neon text-void border-neon">Log Entry</button>
-                </form>
+                ) : (
+                  <div className="space-y-6">
+                    <p className="text-sm mb-6 opacity-80">Pride Directive Active. Use logs to affirm your worth.</p>
+                    <form className="space-y-4" onSubmit={(e) => {
+                      e.preventDefault();
+                      const form = e.target as HTMLFormElement;
+                      const formData = new FormData(form);
+                      const newLog = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        timestamp: Date.now(),
+                        trigger: formData.get('trigger') as string,
+                        action: formData.get('action') as string,
+                        feeling: formData.get('feeling') as string,
+                      };
+                      setData({ ...data, logs: [newLog, ...data.logs] });
+                      form.reset();
+                    }}>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input name="trigger" className="brutal-input" placeholder="Trigger node..." required />
+                        <input name="action" className="brutal-input" placeholder="Pride act..." required />
+                        <input name="feeling" className="brutal-input" placeholder="Resulting energy..." required />
+                      </div>
+                      <button type="submit" className="brutal-btn w-full bg-neon text-void border-neon">LOG PRIDE</button>
+                    </form>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-4">

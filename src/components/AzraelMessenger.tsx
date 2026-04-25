@@ -76,8 +76,8 @@ export const AzraelMessenger = () => {
     <div className="h-full bg-void border-l-4 border-zinc-800 flex flex-col font-mono">
       {/* Header */}
       <div className="p-4 border-b-2 border-gargoyle-teal bg-zinc-900 flex items-center gap-3">
-        <img src="/gargoyle-sentry-head.png" className="w-10 h-10 animate-pulse" referrerPolicy="no-referrer" />
-        <h3 className="text-gargoyle-teal tracking-tighter font-bold">AZRAEL // ACTIVE SENTRY</h3>
+        <Terminal className="w-10 h-10 text-gargoyle-teal animate-pulse" />
+        <h3 className="text-gargoyle-teal tracking-tighter font-bold">AZRAEL // ACTIVE SENTRY [v2.4.0]</h3>
       </div>
 
       {/* Messaging Area */}
