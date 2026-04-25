@@ -172,6 +172,17 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
 
   return (
     <div className="space-y-8">
+      {/* Guiding Philosophy */}
+      <div className="brutal-card border-sentry text-zinc-300 p-6">
+        <h2 className="text-xl font-bold uppercase tracking-widest text-white mb-2">Sovereign Protocol: The Mechanics of Control</h2>
+        <p className="text-sm italic mb-4">
+          "This app is all about gaining control of your actions. When a client truly gains control, these tools will no longer be useful to them; they gain their authority of their mind back. It's not about getting rid of the voices or the anxieties; it's about rewiring the mind to work for you, not against you."
+        </p>
+        <p className="text-xs font-mono opacity-60">
+          NOTE: Each step must be completed manually. Acknowledgment is the register. If it were automatic, it would not register in the mind.
+        </p>
+      </div>
+
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
         <div className="grid grid-cols-5 gap-2 flex-1 w-full">
           {[1, 2, 3].map((p) => (
@@ -305,24 +316,26 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
                 </div>
                 
                 {!data.phase2Acknowledged ? (
-                  <div className="p-6 bg-void border-2 border-blood-red space-y-4 animate-pulse">
-                    <h3 className="text-blood-red font-bold uppercase tracking-widest text-lg">Manual Override Required</h3>
+                  <div className="p-6 bg-void border-2 border-neon space-y-4">
+                    <h3 className="text-neon font-bold uppercase tracking-widest text-lg">Manual Directive: Pride Authority</h3>
                     <p className="text-sm italic text-zinc-300">
-                      1. Acknowledge that the voices are not your enemies—they are your unused energy.<br />
-                      2. Rewire the anxiety: it is not a warning of failure; it is the sound of the engine starting.<br />
-                      3. Click 'Acknowledge' to build your shield.
+                      To gain authority over your mind, you must actively register each action. This is not about removing anxiety; it is about manual rewiring.
                     </p>
+                    <div className="text-xs space-y-2 opacity-80">
+                      <p>1. Acknowledge the voices as surplus energy, not enemies.</p>
+                      <p>2. View anxiety as an engine starting, not a failure.</p>
+                      <p>3. Acknowledge manually—if it were automatic, it wouldn't register.</p>
+                    </div>
                     <button 
                       onClick={() => setData({ ...data, phase2Acknowledged: true })}
-                      className="brutal-btn w-full bg-blood-red text-white border-blood-red"
+                      className="brutal-btn w-full bg-neon text-void border-neon"
                     >
-                      ACKNOWLEDGE
+                      REGISTER ACKNOWLEDGMENT
                     </button>
-                    <p className="text-[8px] text-zinc-500 font-mono text-center">"IF IT WAS AUTOMATIC, IT WOULD NEVER REGISTER IN THE MIND."</p>
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    <p className="text-sm mb-6 opacity-80">Pride Directive Active. Use logs to affirm your worth.</p>
+                    <p className="text-sm mb-6 opacity-80">Pride Directive Active. Register each manual action to affirm your worth and reclaim authority.</p>
                     <form className="space-y-4" onSubmit={(e) => {
                       e.preventDefault();
                       const form = e.target as HTMLFormElement;
@@ -338,11 +351,11 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
                       form.reset();
                     }}>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <input name="trigger" className="brutal-input" placeholder="Trigger node..." required />
-                        <input name="action" className="brutal-input" placeholder="Pride act..." required />
-                        <input name="feeling" className="brutal-input" placeholder="Resulting energy..." required />
+                        <input name="trigger" className="brutal-input" placeholder="What triggered the surplus energy?" required />
+                        <input name="action" className="brutal-input" placeholder="Manual act of authority..." required />
+                        <input name="feeling" className="brutal-input" placeholder="The feeling of control..." required />
                       </div>
-                      <button type="submit" className="brutal-btn w-full bg-neon text-void border-neon">LOG PRIDE</button>
+                      <button type="submit" className="brutal-btn w-full bg-neon text-void border-neon">REGISTER MANUAL ACTION</button>
                     </form>
                   </div>
                 )}
