@@ -8,19 +8,13 @@ export const useSentryGuard = () => {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        // If they switch tabs/apps, we wipe the current view to ensure containment
-        console.warn("BREACH DETECTED: FOCUS LOST. LOCKING VAULT.");
-        // We use a simple reload to reset the application state
-        window.location.reload(); 
+        console.warn("FOCUS LOST. SENTRY RECALIBRATING.");
       }
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Simulate "Recording Breach" detection for PrintScreen or common capture shortcuts
       if (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && e.key === 'S')) {
-        console.error("HARDWARE SECURITY BREACH: RECORDING DETECTED. BLACKLISTING PRINCIPAL.");
-        alert("SECURITY BREACH DETECTED. HARDWARE STAKE FORFEITED.");
-        window.location.href = "about:blank";
+        console.error("CAPTURE ATTEMPT LOGGED.");
       }
     };
 

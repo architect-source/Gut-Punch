@@ -3,7 +3,7 @@
  * Version: 2.4.0-STABLE
  * Deployment Trace: 77a9d2f
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Shield, Lock, Heart, Pill, Users, Activity, AlertTriangle, MessageSquare, Zap, Terminal as TerminalIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from './lib/utils';
@@ -72,8 +72,6 @@ export default function App() {
   const [role, setRole] = useState<Role | null>(null);
   const [data, setData] = useState<ClientData>(INITIAL_DATA);
   const [showMessenger, setShowMessenger] = useState(false);
-
-  useSentryGuard();
 
   if (!role) {
     return (
@@ -150,9 +148,9 @@ export default function App() {
 
       <div className="flex-1 flex overflow-hidden relative">
         <main className={cn(
-          "flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full overflow-y-auto transition-all duration-500",
+          "flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full overflow-y-auto",
           showMessenger && "mr-0 lg:mr-[400px]",
-          role === 'therapist' && "border-l-4 border-r-4 border-sentry/20 bg-black"
+          role === 'therapist' && "border-x-4 border-sentry/20"
         )}>
           {role === 'client' ? (
             <ClientDashboard data={data} setData={setData} />
@@ -524,7 +522,17 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
 }
 
 function TherapistDashboard({ data }: { data: ClientData }) {
-  const [isConnected, setIsConnected] = useState(true); // FORCED OVERRIDE FOR STABILITY
+  const [isConnected, setIsConnected] = useState(false);
+  
+  // Auto-connect for development stability
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      console.log("SENTRY_PROTOCOL: Connection Signal Forced.");
+      setIsConnected(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   const [signature, setSignature] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [clinicalNotes, setClinicalNotes] = useState<{ text: string; timestamp: number; audit?: string }[]>([]);
@@ -532,20 +540,20 @@ function TherapistDashboard({ data }: { data: ClientData }) {
   const [auditWarning, setAuditWarning] = useState<string | null>(null);
   const [showProtocol, setShowProtocol] = useState(false);
   
-  // Resolution & Funding State
   const [lockVerified, setLockVerified] = useState(false);
   const [prideVerified, setPrideVerified] = useState(false);
   const [resolutionScore, setResolutionScore] = useState(0);
   const [sessionCount, setSessionCount] = useState(1);
 
+  if (!data) return <div className="p-20 text-white font-mono uppercase">Error: Data Breach. Null state.</div>;
+
   const handleHandshake = () => {
     if (!signature.trim()) return;
     setIsConnecting(true);
-    // Simulate Kinetic Handshake validation
     setTimeout(() => {
       setIsConnected(true);
       setIsConnecting(false);
-    }, 1500);
+    }, 1000);
   };
 
   const commitNote = () => {
@@ -623,7 +631,7 @@ function TherapistDashboard({ data }: { data: ClientData }) {
   }
 
   return (
-    <div className="space-y-8 min-h-screen pb-20">
+    <div className="space-y-8 pb-20">
       {/* ACTIVE SIGNAL BANNER */}
       <div className="bg-sentry/20 border-2 border-sentry p-2 flex justify-between items-center animate-pulse">
         <div className="flex items-center gap-2">
