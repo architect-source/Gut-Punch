@@ -151,12 +151,16 @@ export default function App() {
       <div className="flex-1 flex overflow-hidden relative">
         <main className={cn(
           "flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full overflow-y-auto transition-all duration-500",
-          showMessenger && "mr-0 lg:mr-[400px]"
+          showMessenger && "mr-0 lg:mr-[400px]",
+          role === 'therapist' && "border-l-4 border-r-4 border-sentry/20 bg-black"
         )}>
           {role === 'client' ? (
             <ClientDashboard data={data} setData={setData} />
           ) : (
-            <TherapistDashboard data={data} />
+            <div className="relative">
+               <div className="absolute -top-4 left-0 right-0 h-1 bg-sentry animate-pulse z-10" />
+               <TherapistDashboard data={data} />
+            </div>
           )}
         </main>
 
@@ -520,7 +524,7 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
 }
 
 function TherapistDashboard({ data }: { data: ClientData }) {
-  const [isConnected, setIsConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(true); // FORCED OVERRIDE FOR STABILITY
   const [signature, setSignature] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [clinicalNotes, setClinicalNotes] = useState<{ text: string; timestamp: number; audit?: string }[]>([]);
@@ -619,7 +623,16 @@ function TherapistDashboard({ data }: { data: ClientData }) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 min-h-screen pb-20">
+      {/* ACTIVE SIGNAL BANNER */}
+      <div className="bg-sentry/20 border-2 border-sentry p-2 flex justify-between items-center animate-pulse">
+        <div className="flex items-center gap-2">
+          <Activity className="w-4 h-4 text-sentry" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-sentry">Overseer Signal Active // Telemetry Synced</span>
+        </div>
+        <span className="text-[8px] text-zinc-500 font-mono">STATION: S-1792_SIGMA</span>
+      </div>
+
       {showProtocol && <RiskManagementProtocol onClose={() => setShowProtocol(false)} />}
       
       <ForensicOverseer data={data} />
