@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Zap, ShieldAlert, Activity, Plus, Trash2 } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
+import { genAI } from '../lib/gemini';
 
 interface Trigger {
   id: string;
@@ -14,8 +14,6 @@ export const TriggerLab = () => {
   const [triggers, setTriggers] = useState<Trigger[]>([]);
   const [input, setInput] = useState('');
   
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
   const addTrigger = () => {
     if (!input.trim()) return;
     const newTrigger: Trigger = {
@@ -34,15 +32,15 @@ export const TriggerLab = () => {
     setTriggers(prev => prev.map(t => t.id === id ? { ...t, isAnalyzing: true } : t));
 
     try {
-      const response = await ai.models.generateContent({
+      const response = await genAI.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: [{ role: 'user', parts: [{ text: `Analyze this trigger and provide a Sovereign Resolution Protocol: "${trigger.text}"` }] }],
         config: {
           systemInstruction: `You are AZRAEL, a Sovereign Sentry. 
-          Provide a "Sovereign Resolution Protocol" for the given trigger.
-          The protocol should be brutal, protective, and focused on GutPunch philosophy.
-          Use terms like "The Lock", "The Pride Directive", "Cold Iron", and "The Shield".
-          Keep it concise. Max 3 steps.`,
+            Provide a "Sovereign Resolution Protocol" for the given trigger.
+            The protocol should be brutal, protective, and focused on GutPunch philosophy.
+            Use terms like "The Lock", "The Pride Directive", "Cold Iron", and "The Shield".
+            Keep it concise. Max 3 steps.`,
         }
       });
 

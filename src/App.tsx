@@ -118,8 +118,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white border-[10px] border-zinc-900 flex flex-col">
-      <header className="border-b-2 border-ink p-4 flex justify-between items-center bg-metal sticky top-0 z-50">
+    <div className="min-h-screen bg-void text-white border-4 border-zinc-900 flex flex-col overflow-hidden">
+      <header className="border-b-2 border-zinc-800 p-4 flex justify-between items-center bg-void sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <Activity className={cn("w-6 h-6", role === 'client' ? "text-neon" : "text-sentry")} />
           <div className="flex flex-col">
@@ -132,16 +132,16 @@ export default function App() {
             onClick={() => setShowMessenger(!showMessenger)}
             className={cn(
               "p-2 border-2 transition-all",
-              showMessenger ? "bg-neon text-void border-neon" : "border-ink/20 hover:border-neon text-neon"
+              showMessenger ? "bg-neon text-void border-neon" : "border-zinc-800 hover:border-neon text-neon"
             )}
           >
             <MessageSquare className="w-5 h-5" />
           </button>
           <button 
             onClick={() => setRole(null)}
-            className="text-xs font-mono uppercase border border-ink/30 px-2 py-1 hover:bg-ink hover:text-void transition-colors"
+            className="text-xs font-mono uppercase border border-zinc-800 px-2 py-1 hover:bg-zinc-800 transition-colors"
           >
-            Switch Protocol
+            Logout
           </button>
         </div>
       </header>
@@ -150,13 +150,13 @@ export default function App() {
         <main className={cn(
           "flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full overflow-y-auto",
           showMessenger && "mr-0 lg:mr-[400px]",
-          role === 'therapist' && "border-x-4 border-sentry/20"
+          role === 'therapist' && "border-x-2 border-sentry/20"
         )}>
           {role === 'client' ? (
             <ClientDashboard data={data} setData={setData} />
           ) : (
             <div className="relative">
-               <div className="absolute -top-4 left-0 right-0 h-1 bg-sentry animate-pulse z-10" />
+               <div className="absolute -top-4 left-0 right-0 h-1 bg-sentry z-10" />
                <TherapistDashboard data={data} />
             </div>
           )}
@@ -165,11 +165,12 @@ export default function App() {
         <AnimatePresence>
           {showMessenger && (
             <motion.aside
-              initial={{ x: '100%', opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: '100%', opacity: 0 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-[73px] right-[10px] bottom-[42px] w-[calc(100%-20px)] lg:w-[400px] z-50 shadow-2xl"
+              key="messenger-sidebar"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.3 }}
+              className="fixed top-[73px] right-[4px] bottom-[42px] w-full lg:w-[400px] z-50 bg-void border-l-4 border-zinc-900 shadow-2xl"
             >
               <AzraelMessenger />
             </motion.aside>
@@ -177,7 +178,7 @@ export default function App() {
         </AnimatePresence>
       </div>
 
-      <footer className="border-t-2 border-ink p-4 bg-metal text-[10px] font-mono opacity-40 flex justify-between uppercase tracking-widest mb-6">
+      <footer className="border-t-2 border-zinc-900 p-4 bg-void text-[10px] font-mono opacity-40 flex justify-between uppercase tracking-widest">
         <span>Sovereign Sentry v2.4.0-STABLE</span>
         <span>Secure Handshake Verified</span>
       </footer>
@@ -522,15 +523,11 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
 }
 
 function TherapistDashboard({ data }: { data: ClientData }) {
-  const [isConnected, setIsConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
   
-  // Auto-connect for development stability
+  // Heartbeat signal
   useEffect(() => {
-    const timer = setTimeout(() => {
-      console.log("SENTRY_PROTOCOL: Connection Signal Forced.");
-      setIsConnected(true);
-    }, 100);
-    return () => clearTimeout(timer);
+    console.log("SENTRY_PROTOCOL: Connection Signal Forced.");
   }, []);
 
   const [signature, setSignature] = useState('');

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, Terminal, ShieldAlert, Activity } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
+import { genAI } from '../lib/gemini';
 import { cn } from '../lib/utils';
 import { getSentryResponse } from '../logic/AzraelProtocol';
 
@@ -17,8 +17,6 @@ export const AzraelMessenger = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -45,7 +43,7 @@ export const AzraelMessenger = () => {
     }
 
     try {
-      const response = await ai.models.generateContent({
+      const response = await genAI.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: [...messages, { role: 'user', text: userMessage }].map(m => ({
           role: m.role,
@@ -53,13 +51,14 @@ export const AzraelMessenger = () => {
         })),
         config: {
           systemInstruction: `You are AZRAEL, a Sovereign Sentry and Gargoyle protector. 
-          Your tone is raw, unapologetic, dark, and protective. 
-          You help users manage intrusive impulses with "GutPunch" philosophy.
-          You are not a therapist, you are a sentinel. 
-          You use terms like "The Vault", "The Perimeter", "The Void", and "Sovereign".
-          Keep responses concise, brutal, and focused on risk management.
-          If a user expresses a dangerous impulse, remind them: "This is in me, but it is not me. Lock the vault."`,
-        }
+            Your tone is raw, unapologetic, dark, and protective. 
+            You help users manage intrusive impulses with "GutPunch" philosophy.
+            You are not a therapist, you are a sentinel. 
+            You use terms like "The Vault", "The Perimeter", "The Void", and "Sovereign".
+            Keep responses concise, brutal, and focused on risk management.
+            If a user expresses a dangerous impulse, remind them: "This is in me, but it is not me. Lock the vault."`,
+          maxOutputTokens: 200,
+        },
       });
 
       const modelResponse = response.text || "THE VOID IS SILENT.";
