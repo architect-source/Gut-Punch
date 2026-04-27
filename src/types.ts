@@ -1,5 +1,12 @@
 export type Role = 'client' | 'therapist';
 
+export interface BiometricPoint {
+  timestamp: number;
+  hrv: number; // Heart Rate Variability
+  gsr: number; // Galvanic Skin Response
+  stressIndex: number;
+}
+
 export interface LogEntry {
   id: string;
   timestamp: number;
@@ -7,6 +14,7 @@ export interface LogEntry {
   action: string;
   feeling: string;
   prideScore?: number;
+  biometricTrace?: BiometricPoint;
 }
 
 export interface Medication {
@@ -23,6 +31,14 @@ export interface Medication {
   notes: string;
 }
 
+export interface SessionBattlePlan {
+  phase1: string; // Biometric Review
+  phase2: string; // Spike Analysis
+  phase3: string; // Cognitive Restructuring
+  phase4: string; // Hardening
+  isComplete: boolean;
+}
+
 export interface ClientData {
   id: string;
   name: string;
@@ -32,4 +48,6 @@ export interface ClientData {
   medications: Medication[];
   boundaries: string[];
   phase2Acknowledged?: boolean;
+  biometrics: BiometricPoint[];
+  currentBattlePlan?: SessionBattlePlan;
 }

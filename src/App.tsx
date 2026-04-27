@@ -25,6 +25,9 @@ import { DeescalationToolkit } from './components/DeescalationToolkit';
 import { DSM5Bridge } from './components/DSM5Bridge';
 import { DSM5_CATEGORIES } from './constants/DSM5Data';
 import { RiskManagementProtocol } from './components/RiskManagementProtocol';
+import { BiometricMonitor } from './components/BiometricMonitor';
+import { BlackoutProtocol } from './components/BlackoutProtocol';
+import { ForensicOverseer } from './components/ForensicOverseer';
 
 // Mock initial data
 const INITIAL_DATA: ClientData = {
@@ -48,7 +51,20 @@ const INITIAL_DATA: ClientData = {
       notes: 'Monitor for increased anxiety during drops.' 
     }
   ],
-  boundaries: []
+  boundaries: [],
+  biometrics: [
+    { timestamp: Date.now() - 3600000, hrv: 55, gsr: 0.5, stressIndex: 20 },
+    { timestamp: Date.now() - 1800000, hrv: 42, gsr: 0.8, stressIndex: 45 },
+    { timestamp: Date.now() - 600000, hrv: 30, gsr: 1.2, stressIndex: 75 },
+    { timestamp: Date.now(), hrv: 65, gsr: 0.3, stressIndex: 15 },
+  ],
+  currentBattlePlan: {
+    phase1: "Review weekly biometric spikes (detected 2 occurrences of HRV < 35).",
+    phase2: "Analyze sentiment congruency during Titan Strike usage.",
+    phase3: "Restructure boundaries regarding digital intake.",
+    phase4: "Deploy Level 2 Blackout for evening stabilization.",
+    isComplete: false
+  }
 };
 
 export default function App() {
@@ -168,7 +184,7 @@ export default function App() {
 }
 
 function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: ClientData) => void }) {
-  const [activePhase, setActivePhase] = useState<number | 'village' | 'tools'>(1);
+  const [activePhase, setActivePhase] = useState<number | 'village' | 'tools' | 'sentry'>(1);
 
   return (
     <div className="space-y-8">
@@ -207,19 +223,59 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
             The Village
           </button>
           <button
+            onClick={() => setActivePhase('sentry')}
+            className={cn(
+              "p-2 border-2 font-mono uppercase text-[10px] transition-all",
+              activePhase === 'sentry' ? "bg-blood-red text-white border-blood-red" : "border-blood-red/20 text-blood-red hover:border-blood-red"
+            )}
+          >
+            Active Sentry
+          </button>
+          <button
             onClick={() => setActivePhase('tools')}
             className={cn(
               "p-2 border-2 font-mono uppercase text-[10px] transition-all",
-              activePhase === 'tools' ? "bg-blood-red text-ink border-blood-red" : "border-blood-red/40 text-blood-red hover:border-blood-red"
+              activePhase === 'tools' ? "bg-blood-red/40 text-ink border-blood-red/60" : "border-ink/10 text-zinc-500 hover:border-ink"
             )}
           >
-            Sovereign Tools
+            Old Tools
           </button>
         </div>
       </div>
 
       <AnimatePresence mode="wait">
-        {activePhase === 'tools' ? (
+        {activePhase === 'sentry' ? (
+          <motion.div
+            key="active-sentry"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            className="space-y-8"
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <BiometricMonitor data={data.biometrics} />
+              <BlackoutProtocol />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <TerminalIcon className="text-neon w-5 h-5" />
+                  <h2 className="text-xl font-bold uppercase tracking-tighter">Truth Giver Protocol</h2>
+                </div>
+                <AzraelChat />
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="text-blood-red w-5 h-5" />
+                  <h2 className="text-xl font-bold uppercase tracking-tighter">Titan Strike Terminal</h2>
+                </div>
+                <TitanStrikeTerminal impulse={data.intrusiveImpulse} />
+              </div>
+            </div>
+          </motion.div>
+        ) : activePhase === 'tools' ? (
           <motion.div
             key="sovereign-tools"
             initial={{ opacity: 0, scale: 0.98 }}
@@ -557,6 +613,8 @@ function TherapistDashboard({ data }: { data: ClientData }) {
   return (
     <div className="space-y-8">
       {showProtocol && <RiskManagementProtocol onClose={() => setShowProtocol(false)} />}
+      
+      <ForensicOverseer data={data} />
       
       <div className="brutal-card border-sentry bg-sentry/5">
         <div className="flex justify-between items-start mb-6">
