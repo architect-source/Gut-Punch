@@ -75,9 +75,14 @@ export const AzraelMessenger = () => {
   return (
     <div className="h-full bg-void border-l-4 border-zinc-800 flex flex-col font-mono">
       {/* Header */}
-      <div className="p-4 border-b-2 border-gargoyle-teal bg-zinc-900 flex items-center gap-3">
-        <Terminal className="w-10 h-10 text-gargoyle-teal animate-pulse" />
-        <h3 className="text-gargoyle-teal tracking-tighter font-bold">AZRAEL // ACTIVE SENTRY [v2.4.0]</h3>
+      <div className="p-4 border-b-2 border-gargoyle-teal bg-zinc-900 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Terminal className="w-10 h-10 text-gargoyle-teal animate-pulse" />
+          <h3 className="text-gargoyle-teal tracking-tighter font-bold uppercase">AZRAEL // SENTRY_CORE [v2.4.0]</h3>
+        </div>
+        <div className="text-[8px] font-mono text-neon bg-neon/10 px-2 py-0.5 border border-neon/30 uppercase">
+          Perimeter Secure
+        </div>
       </div>
 
       {/* Messaging Area */}

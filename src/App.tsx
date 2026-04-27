@@ -28,6 +28,7 @@ import { RiskManagementProtocol } from './components/RiskManagementProtocol';
 import { BiometricMonitor } from './components/BiometricMonitor';
 import { BlackoutProtocol } from './components/BlackoutProtocol';
 import { ForensicOverseer } from './components/ForensicOverseer';
+import { SystemAuditLog } from './components/SystemAuditLog';
 
 // Mock initial data
 const INITIAL_DATA: ClientData = {
@@ -273,6 +274,13 @@ function ClientDashboard({ data, setData }: { data: ClientData, setData: (d: Cli
                 </div>
                 <TitanStrikeTerminal impulse={data.intrusiveImpulse} />
               </div>
+            </div>
+
+            <div className="brutal-card border-zinc-800 bg-void/50">
+              <h3 className="text-sm font-mono uppercase mb-4 opacity-50 flex items-center gap-2">
+                <TerminalIcon className="w-4 h-4" /> Sovereign Sentry Audit Trace
+              </h3>
+              <SystemAuditLog />
             </div>
           </motion.div>
         ) : activePhase === 'tools' ? (

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Target, TrendingDown, Eye, Mic, Brain, ClipboardCheck } from 'lucide-react';
+import { Target, TrendingDown, Eye, Mic, Brain, ClipboardCheck, Terminal } from 'lucide-react';
 import { cn } from '../lib/utils';
 import type { ClientData, SessionBattlePlan } from '../types';
+import { SystemAuditLog } from './SystemAuditLog';
 
 interface ForensicOverseerProps {
   data: ClientData;
@@ -10,6 +11,7 @@ interface ForensicOverseerProps {
 
 export const ForensicOverseer: React.FC<ForensicOverseerProps> = ({ data }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showLogs, setShowLogs] = useState(false);
   const [sentiments, setSentiments] = useState({ masking: 12, congruency: 88, distress: 42 });
 
   const runSentimentAnalysis = () => {
@@ -144,6 +146,28 @@ export const ForensicOverseer: React.FC<ForensicOverseerProps> = ({ data }) => {
           </button>
         </div>
       </div>
+      <div className="flex justify-center">
+        <button 
+          onClick={() => setShowLogs(!showLogs)}
+          className={cn(
+            "brutal-btn flex items-center gap-2 px-8 py-3 transition-all",
+            showLogs ? "bg-blood-red text-white border-blood-red" : "border-zinc-800 text-zinc-500 hover:border-blood-red"
+          )}
+        >
+          <Terminal className="w-4 h-4" />
+          {showLogs ? 'CONCEAL FORENSIC LOGS' : 'ACCESS SYSTEM AUDIT TRACE'}
+        </button>
+      </div>
+
+      {showLogs && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="brutal-card border-blood-red bg-void"
+        >
+          <SystemAuditLog />
+        </motion.div>
+      )}
     </div>
   );
 };
